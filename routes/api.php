@@ -115,9 +115,6 @@ Route::middleware('auth:sanctum')
 Route::middleware('auth:sanctum')
     ->get('client/appointment/get' , [\App\Http\Controllers\AppointmentController::class , 'getClientAppointments']);
 
-Route::middleware('auth:sanctum')
-    ->get('client/appointment/finished' , [\App\Http\Controllers\AppointmentController::class , 'getClientCompleted']);
-
 // Show specific appointment
 Route::middleware('auth:sanctum')
     ->get('client/appointment/show/{app_id}' , [\App\Http\Controllers\AppointmentController::class , 'showAppointment']);
@@ -196,7 +193,7 @@ Route::middleware('auth:sanctum')
 
 // Services
 Route::middleware('auth:sanctum')
-    ->post('admin/add/service' , [\App\Http\Controllers\ServicesController::class , 'createService']);
+    ->post('admin/addService' , [\App\Http\Controllers\ServicesController::class , 'createService']);
 Route::middleware('auth:sanctum')
     ->delete('admin/delete/service/{id}' , [\App\Http\Controllers\ServicesController::class , 'deleteService']);
 

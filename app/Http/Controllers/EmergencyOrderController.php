@@ -178,7 +178,7 @@ class EmergencyOrderController extends Controller
             $deviceTokens = [$emergency->client->device_token];
 
             $title = "Request Approved";
-            $body = "The Provider ". $provider->name . " Approved your emergency request";
+            $body = "The Provider ". $provider->name . "Approved your emergency request";
 
             Notification::create([
                 'user_id'=> $client_id,

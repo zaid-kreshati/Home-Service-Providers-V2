@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\Profile_Provider;
 use App\Models\User;
 use App\Models\Wallet;
 use Illuminate\Http\JsonResponse;
@@ -26,15 +25,6 @@ class AuthService
             Wallet::create([
                 'provider_id' => $user['id'],
                 'balance'=> 0,
-            ]);
-
-            Profile_Provider::create([
-                'provider_id'=> $user['id'],
-                'image_id'=>1,
-                'service_id'=>1,
-                'years_experience'=>0,
-                'description'=> 'This is description',
-                'phone'=> 000000000
             ]);
         }
 

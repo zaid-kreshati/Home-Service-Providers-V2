@@ -43,8 +43,7 @@ class ServicesController extends Controller
                     'name' => $profileProvider->provider->name,
                     'email' => $profileProvider->provider->email,
                     'city' => $profileProvider->provider->city->city_name,
-                    'rating' => $profileProvider->provider->receivedRatings->isNotEmpty() ? (float) $profileProvider->provider->receivedRatings->first()->average_rating : 0
-
+                    'rating'=> $profileProvider->provider->receivedRatings
                 ],
                 'image' => $profileProvider->image->path,
                 'service' => $profileProvider->service->name,
@@ -59,7 +58,7 @@ class ServicesController extends Controller
 
     public function getServices() : JsonResponse
     {
-        $services = Service::query()->with('image')->where('name' , '!=' , 'No Service')->get()
+        $services = Service::query()->with('image')->get()
             ->map(function ($service) {
                 return [
                     'id'=> $service->id,
@@ -82,7 +81,7 @@ class ServicesController extends Controller
         }
 
         $userCityId = $user->city_id;
-//
+//        dd($userCityId);
 
         $profileProviders = Profile_Provider::with([
             'provider' => function ($query) use ($userCityId) {
@@ -114,8 +113,7 @@ class ServicesController extends Controller
                     'name' => $profileProvider->provider->name,
                     'email' => $profileProvider->provider->email,
                     'city' => $profileProvider->provider->city->city_name,
-                    'rating' => $profileProvider->provider->receivedRatings->isNotEmpty() ? (float) $profileProvider->provider->receivedRatings->first()->average_rating : 0
-
+                    'rating'=> $profileProvider->provider->receivedRatings->first()->average_rating
 
                 ],
                 'image' => $profileProvider->image ? $profileProvider->image->path : null,
@@ -176,7 +174,7 @@ class ServicesController extends Controller
         // Handle image upload
         if ($request->hasFile('image')) {
             $image = $request->file('image');
-            $imageName = $image->getClientOriginalName();
+            $imageName = time() . '_' . $image->getClientOriginalName();
             $image->storeAs('images', $imageName, 'public');
             $imageModel = Image::create(['path' => $imageName]);
             $imageId = $imageModel->id;

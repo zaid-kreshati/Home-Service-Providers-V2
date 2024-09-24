@@ -14,7 +14,6 @@ class SubscriptionController extends Controller
         $plans = SubscriptionPlan::all()
             ->map(function ($plan){
                 return [
-                    'id'=> $plan->id,
                     'name'=> $plan->name,
                     'price'=> $plan->price,
                     'duration'=> $plan->duration

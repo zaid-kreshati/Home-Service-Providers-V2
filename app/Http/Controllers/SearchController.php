@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class SearchController extends Controller
 {
-    public function searchProviders(Request $request) : JsonResponse
+    public function searchProviders(Request $request): JsonResponse
     {
 
         if ($request->has('provider_name') || $request->has('service_name')) {
@@ -17,11 +17,11 @@ class SearchController extends Controller
                     $query->select('id', 'name', 'email', 'city_id')->with('city:id,city_name');
                 },
                 'service:id,name',
-                'image:id,path'
+                'image:id,path',
             ]);
 
         }
-        else {
+        else  {
             return response()->json(['Message'=>'TEST']);
         }
 
@@ -34,17 +34,18 @@ class SearchController extends Controller
             });
         }
 
-        if ($request->has('service_name')) {
+        if ($request->has('service_name'))
+        {
             $serviceName = $request->input('service_name');
             $query->whereHas('service', function ($q) use ($serviceName) {
                 $q->where('name', 'like', '%' . $serviceName . '%');
             });
         }
 
-        $profileProviders = $query->get(['id', 'provider_id', 'image_id', 'service_id', 'years_experience', 'description', 'phone', 'created_at', 'updated_at']);
+        $profileProviders =     $query->get(['id', 'provider_id', 'image_id', 'service_id', 'years_experience', 'description', 'phone', 'created_at', 'updated_at']);
 
         // Transform the data to exclude unnecessary fields and flatten the structure
-        $transformedProviders = $profileProviders->map(function ($profileProvider) {
+        $transformedProviders =     $profileProviders->map(function ($profileProvider) {
             return [
                 'id' => $profileProvider->id,
                 'provider' => [
