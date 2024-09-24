@@ -13,7 +13,7 @@ class AdsController extends Controller
     {
         // Retrieve active advertisements with provider data
         $advertisements = Advertisement::where('is_active', true)
-            ->with(['provider.city' , 'provider.profile' ,'provider.profile.image'])
+            ->with(['provider.city' , 'provider.profile'])
             ->orderBy('start_date', 'asc')
             ->get()
             ->unique('provider_id')
@@ -25,7 +25,7 @@ class AdsController extends Controller
                     'start_date' => $ad->start_date,
                     'end_date'=> $ad->end_date,
                     'city'=> $ad->provider->city->city_name,
-                    'image'=> $ad->provider->profile->image->path,
+
                     'service'=> $ad->provider->profile->service->name,
                     'phone'=> $ad->provider->profile->phone,
                     'years_Exp'=> $ad->provider->profile->years_experience,
@@ -34,12 +34,9 @@ class AdsController extends Controller
             });
 
 
-     //   dd($advertisements);
         return response()->json([
             'Message'=> 'First 5 Active Providers',
             'data'=> $advertisements
         ]);
     }
-
-
 }

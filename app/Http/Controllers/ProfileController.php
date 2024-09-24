@@ -85,7 +85,7 @@ class ProfileController extends Controller
             'years_experience' => 'required|integer|min:0',
             'phone' => 'required|string|max:15',
             'description' => 'nullable|string',
-            'image' => 'sometimes|image',
+            'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif',
         ]);
 
         if ($validated->fails()) {
