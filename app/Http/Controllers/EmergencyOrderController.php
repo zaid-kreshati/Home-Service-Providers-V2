@@ -2,123 +2,63 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\NotifyProvidersJob;
 use App\Models\Emergency;
 use App\Models\Emergency_Provider;
 use App\Models\Notification;
 use App\Models\Profile_Provider;
 use App\Models\User;
+use App\Services\EmergencyOrderService;
 use App\Services\FirebaseService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use function PHPUnit\Framework\isEmpty;
 
 class EmergencyOrderController extends Controller
 {
 
-    protected $firebaseService;
+    protected FirebaseService $firebaseService;
+    protected EmergencyOrderService $emergencyService;
 
-    public function __construct(FirebaseService $firebaseService)
+    public function __construct(FirebaseService $firebaseService , EmergencyOrderService $emergencyService)
     {
         $this->firebaseService = $firebaseService;
+        $this->emergencyService = $emergencyService;
     }
 
     // Create Emergency order and Notify all providers in the same city
     public function createEmergency(Request $request) : JsonResponse
     {
-
-
-        // Get the city_id of the authenticated user
-        $authUserCityId = auth()->user()->city_id;
-
-        if(!Auth::user()->hasRole('client')) {
-            return response()->json(['Message'=> 'Not Authorized Client']);
-        }
-
-        // Fetch the providers who offer the requested service and are in the same city
-        $providers = Profile_Provider::where('service_id', $request->service_id)
-            ->whereHas('provider', function ($query) use ($authUserCityId) {
-                $query->where('city_id', $authUserCityId);
-            })
-            ->with('provider')
-            ->distinct('provider.id')
-            ->get()
-            ->pluck('provider');
-
-        if($providers->isEmpty()) {
-            //dd("No Providers In your city");
-            return response()->json(["Message" => "There are No Providers Work In Your City"]);
-        }
-
-        // Extract device tokens
-        $deviceTokens = $providers->pluck('device_token')->filter()->toArray();
-      //  return response()->json($providers);
-
-        $emergency = Emergency::create([
-            'client_id' => auth()->id(),
-            'service' => $request->service_id,
-            'status' => 'pending',
-            'description' => $request->description,
-        ]);
-
-
-        $title = 'New Emergency Request';
-        $body = 'You have a new Emergency Request';
-
-
-        foreach ($providers as $provider) {
-            // Check if the record already exists
-            Emergency_Provider::firstOrCreate([
-                'provider_id' => $provider->id,
-                'emergency_id' => $emergency->id,
-            ]);
-
-            Notification::create([
-                'user_id'=> $provider->id,
-                'title'=>$title ,
-                'details'=> $body
-            ]);
-        }
-
-
         try {
-            // Send notification
-            $response = $this->firebaseService->sendNotification($deviceTokens, $title, $body);
-            // Handle the response if needed
+            [$emergency, $providers] = $this->emergencyService->createEmergency($request);
+
+            // Dispatch the job to notify providers
+            NotifyProvidersJob::dispatch($providers, $emergency);
+
+            return response()->json([
+                'message' => 'Emergency created and providers will be notified.',
+            ]);
         } catch (\Exception $e) {
-            // Handle the exception if needed
             return response()->json(['error' => $e->getMessage()], 500);
         }
-
-        return response()->json([
-            'message' => 'Emergency created and providers notified.',
-            'data'=> $response
-        ]);
     }
-
 
     // Get Provider Requests (Emergency) and update it's status
     public function getProviderEmergencyRequest() : JsonResponse
     {
-        $provider = Auth::user();
+        try {
+            $emergencyRequests = $this->emergencyService->getProviderEmergencyRequest();
 
-        if(!$provider->hasRole('provider')) {
-            return response()->json(['Message' => "Not Authorized"]);
+            return response()->json(['data'=> $emergencyRequests]);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
         }
 
-        $emergencyRequests = Emergency_Provider::where('provider_id' , $provider->id)
-            ->with('emergency')
-            ->whereHas('emergency', function ($query) {
-               $query->where('status', 'pending');
-            })
-            ->get();
-
-        if($emergencyRequests->isEmpty()) {
-            return response()->json(['Message' => "You Don't Have Emergency Requests"]);
-        }
-
-        return response()->json($emergencyRequests);
     }
+
 
     // Update the status of the Emergency request : Approved / Canceled
     public function updateProviderEmergencyRequest(Request $request) : JsonResponse
@@ -200,5 +140,4 @@ class EmergencyOrderController extends Controller
 
         return response()->json(['message' => 'Emergency request status updated successfully']);
     }
-
 }

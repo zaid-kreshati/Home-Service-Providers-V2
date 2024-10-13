@@ -8,7 +8,7 @@ use App\Models\Appointment;
 use App\Models\Notification;
 use App\Models\Rating;
 use App\Services\AppointmentClientService;
-use App\Services\FirebaseService
+use App\Services\FirebaseService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;

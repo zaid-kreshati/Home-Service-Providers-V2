@@ -25,14 +25,12 @@ class AdsController extends Controller
                     'start_date' => $ad->start_date,
                     'end_date'=> $ad->end_date,
                     'city'=> $ad->provider->city->city_name,
-
                     'service'=> $ad->provider->profile->service->name,
                     'phone'=> $ad->provider->profile->phone,
                     'years_Exp'=> $ad->provider->profile->years_experience,
                     'description'=>$ad->provider->profile->description,
                 ];
             });
-
 
         return response()->json([
             'Message'=> 'First 5 Active Providers',
