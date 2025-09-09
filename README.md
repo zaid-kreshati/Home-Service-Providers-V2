@@ -98,9 +98,4 @@ We welcome contributions! If you'd like to contribute to this project:
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## Contact
 
-For questions or collaboration, please reach out to:
-- **Name**: Your Name
-- **Email**: your.email@example.com
-- **GitHub**: [yourusername](https://github.com/yourusername)
