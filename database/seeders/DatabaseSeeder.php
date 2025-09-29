@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
             RegionSeeder::class,
             CitySeeder::class,
             RolePermissionsSeeder::class,
-
+            ImagesSeeder::class,
             ServiceSeeder::class,
 
         ]);
