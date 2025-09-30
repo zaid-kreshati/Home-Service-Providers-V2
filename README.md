@@ -75,7 +75,7 @@ The Home Service Provider App is a robust platform developed using the Laravel f
     php artisan serve
     ```
 
-7. Import the provided Postman collection (postman.postman_collection.json) into Postman.
+7. Import the provided Postman collection (Home Services.postman_collection.json) into Postman.
 
 
 ## Contributing
